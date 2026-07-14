@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/vigicontrolpro
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "260181"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17 # Las fuentes sugieren la v17
+    container_name: vigicontrol-postgres
+    environment:
+      POSTGRES_DB: vigicontrolpro
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "260181"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
